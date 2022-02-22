@@ -2,6 +2,7 @@
 #include <geometry/Common.h>
 #include <hdmap/Map.h>
 #include <visualizer/visualizer.h>
+#include <visualizer/controller.h>
 
 namespace {
     hdmap::Map& get_local_map() {
@@ -9,11 +10,11 @@ namespace {
         return local_map;
     }
 
-    double x = 37.530930, y = 55.702987;
-    const geometry::Vector2d center{x, y};
+    const double x = 37.530930, y = 55.702987;
+    const geometry::Vector2d center(x, y);
 
     void display() {
-        glClearColor(0.0, 0.0, 0.0, 1.0);
+        glClear(GL_COLOR_BUFFER_BIT);
         const auto& nodes = get_local_map().nodes();
         const auto& ways = get_local_map().ways();
         const auto way_polyline = [&](const hdmap::Way& way) {
@@ -22,9 +23,7 @@ namespace {
             for (const auto& node_id : way.node_ids) {
                 const auto& node = nodes.at(node_id);
                 const double scale = 1113.2;
-                polyline.push_back(geometry::Vector2d{
-                    (node.position.get<0>() - center.get<0>()) * scale, 
-                    (node.position.get<1>() - center.get<1>()) * scale});
+                polyline.push_back((node.position - center) * scale);
             }
             return polyline;
         };
@@ -33,17 +32,31 @@ namespace {
         }
         glutSwapBuffers();
     }
+
+    void timer(int) {
+        display();
+        glutTimerFunc(50, timer, 0);
+    }
 }
 
 int main(int argc, char** argv) {
     LOG_EVENT("begin");
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
-    glutInitWindowSize(800, 800);
-    //glTranslated(-y, -x, 0.0);
+
+    glClearColor(0.0, 0.0, 0.0, 1.0);
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+
+    glutInitWindowSize(visualizer::WidthScreen, visualizer::HeightScreen);
     glutCreateWindow("Test");
     glutDisplayFunc(display);
+
+    glutMotionFunc(visualizer::motion_mouse_function);
+    glutPassiveMotionFunc(visualizer::mouse_passive);
+    glutTimerFunc(50, timer, 0);
     glutMainLoop();
+
     LOG_EVENT("end");
     return 0;
 }
