@@ -1,15 +1,9 @@
 #include "Node.h"
 
 namespace hdmap {
-    Node::Node(UUID id, const geometry::Vector2d& coordinate)
-        : id_(id)
-        , coordinate_(coordinate)
-    {
-    }
-
-    std::ostream& operator<<(std::ostream& out, const Node& node) {
-        return  out << "id: " << node.id() 
-                    << " longitude: " << node.longitude() 
-                    << " latitude: " << node.latitude();
+    void parse_node(const boost::property_tree::ptree& tree, Node& node) {
+        node.id = tree.get<UUID>("id", 0);
+        node.position.set<0>(tree.get<double>("lon"));
+        node.position.set<1>(tree.get<double>("lat"));
     }
 }

@@ -1,26 +1,16 @@
 #include "Way.h"
 
-namespace hdmap {
-    Way::Way(UUID id,
-             const std::vector<UUID>& node_ids, 
-             const std::string& name, 
-             const std::string& surface, 
-             double max_speed, 
-             bool one_way) 
-        : id_(id)
-        , node_ids_(node_ids)
-        , name_(name)
-        , surface_(surface)
-        , max_speed_(max_speed)
-        , one_way_(one_way)
-    {
-    }
+#include <logger/Logger.h>
 
-    std::ostream& operator<<(std::ostream& out, const Way& way) {
-        return  out << "id: " << way.id()
-                    << " name:" << way.name()
-                    << " surface: " << way.surface()
-                    << " max speed: " << way.max_speed()
-                    << " one way: " << way.one_way();
+namespace hdmap {
+    void parse_way(const boost::property_tree::ptree& tree, Way& way) {
+        way.id = tree.get_optional<UUID>("id");
+        way.name = tree.get_optional<std::string>("name");
+        way.surface = tree.get_optional<std::string>("surface");
+        way.max_speed = tree.get_optional<double>("max_speed");
+        way.one_way = tree.get_optional<bool>("one_way");
+        for (const auto& id : tree.get_child("node_ids")) {
+            way.node_ids.push_back(boost::lexical_cast<UUID>(id.second.data()));
+        }
     }
 }

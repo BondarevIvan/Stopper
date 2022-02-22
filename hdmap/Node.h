@@ -1,5 +1,6 @@
 #pragma once
 #include <geometry/Common.h>
+#include <boost/property_tree/ptree.hpp>
 #include <sstream>
 
 namespace hdmap {
@@ -8,26 +9,11 @@ namespace hdmap {
         Longitude = 0,
         Latitude = 1
     };
-    class Node {
-    public:
-        Node() = delete;
-        Node(UUID id, const geometry::Vector2d& coordinate);
-        inline UUID id() const { 
-            return id_; 
-        }
-        inline const geometry::Vector2d& coordinate() const { 
-            return coordinate_; 
-        }
-        inline double latitude() const { 
-            return coordinate_.get<static_cast<int>(Coordinates::Latitude)>(); 
-        }
-        inline double longitude() const { 
-            return coordinate_.get<static_cast<int>(Coordinates::Longitude)>(); 
-        }
-    private:
-        UUID id_;
-        geometry::Vector2d coordinate_;
+
+    struct Node {
+        UUID id;
+        geometry::Vector2d position;
     };
 
-    std::ostream& operator<<(std::ostream& out, const Node& node);
+    void parse_node(const boost::property_tree::ptree& tree, Node& node);
 }
