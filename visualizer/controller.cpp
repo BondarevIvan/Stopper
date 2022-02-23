@@ -2,8 +2,6 @@
 
 #include <GL/glut.h>
 
-#include <iostream>
-
 namespace visualizer {
     struct CameraParams {
         double angle{};
@@ -34,7 +32,7 @@ namespace visualizer {
     void motion_mouse_function(int x, int y) {
         const double relative_x = static_cast<double>(x - mouse_state.cursor_pos_x) / WidthScreen;
         const double relative_y = -static_cast<double>(y - mouse_state.cursor_pos_y) / HeightScreen;        
-        translate(geometry::Vector2d{relative_x, relative_y});
+        translate(geometry::Vector2d{relative_x, relative_y} / camera_params.scaling);
         mouse_passive(x, y);
     }
 

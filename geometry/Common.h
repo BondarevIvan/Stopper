@@ -26,4 +26,9 @@ namespace geometry {
 
     Polygon2d make_polygon(const std::vector<Vector2d>& points);
     Polyline2d make_polyline(const std::vector<Vector2d>& points);
+
+    template<class T>
+    T lerp(const T& start, const T& finish, double coef) {
+        return start + (finish - start) * coef;
+    }
 }

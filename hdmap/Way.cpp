@@ -8,7 +8,7 @@ namespace hdmap {
         way.name = tree.get_optional<std::string>("name");
         way.surface = tree.get_optional<std::string>("surface");
         way.max_speed = tree.get_optional<double>("max_speed");
-        way.one_way = tree.get_optional<bool>("one_way");
+        way.role = tree.get_optional<std::string>("role");
         for (const auto& id : tree.get_child("node_ids")) {
             way.node_ids.push_back(boost::lexical_cast<UUID>(id.second.data()));
         }

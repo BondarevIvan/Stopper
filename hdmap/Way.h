@@ -10,7 +10,7 @@ namespace hdmap {
         boost::optional<int> id;
         boost::optional<std::string> name;
         boost::optional<std::string> surface;
-        boost::optional<bool> one_way;
+        boost::optional<std::string> role;
         std::vector<UUID> node_ids;
         boost::optional<double> max_speed;
     };

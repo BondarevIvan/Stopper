@@ -25,7 +25,7 @@ link_libraries(${GLFW_LIBRARIES})
 #Добавляем в сборку исполняемые файлы
 add_executable(${PROJECT_NAME} ${_SOURSCES})
 
-set(Directories visualizer hdmap geometry logger)
+set(Directories visualizer objects hdmap geometry logger)
 
 #Добавляем поддиректорию для поиска подфайла Cmake
 foreach(directory IN LISTS Directories)
@@ -36,7 +36,7 @@ endforeach()
 target_link_libraries(${PROJECT_NAME}
                       ${OPENGL_gl_LIBRARY}
                       ${GLUT_LIBRARIES}
-                       visualizer hdmap geometry logger
+                       visualizer objects hdmap geometry logger
 					   glut
 					   GL
 					   GLU

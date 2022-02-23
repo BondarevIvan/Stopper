@@ -3,32 +3,24 @@
 #include <hdmap/Map.h>
 #include <visualizer/visualizer.h>
 #include <visualizer/controller.h>
+#include <objects/Context.h>
+
+#include <cmath>
 
 namespace {
+    const double scaling_param = 1113;
+    const geometry::Vector2d center{28.333511, 57.817074};
+
     hdmap::Map& get_local_map() {
         static hdmap::Map local_map(logger::root_folder() + "/map.json");
         return local_map;
     }
 
-    const double x = 37.530930, y = 55.702987;
-    const geometry::Vector2d center(x, y);
-
     void display() {
         glClear(GL_COLOR_BUFFER_BIT);
-        const auto& nodes = get_local_map().nodes();
         const auto& ways = get_local_map().ways();
-        const auto way_polyline = [&](const hdmap::Way& way) {
-            geometry::Polyline2d polyline;
-            polyline.reserve(way.node_ids.size());
-            for (const auto& node_id : way.node_ids) {
-                const auto& node = nodes.at(node_id);
-                const double scale = 1113.2;
-                polyline.push_back((node.position - center) * scale);
-            }
-            return polyline;
-        };
-        for (const auto& [uuid, way] : ways) {
-            visualizer::draw_polyline(way_polyline(way), visualizer::make_color(1.0, 1.0, 1.0));
+        for (const auto& way_data : ways) {
+            visualizer::visualize_way(get_local_map(), way_data.second);
         }
         glutSwapBuffers();
     }
@@ -50,6 +42,8 @@ int main(int argc, char** argv) {
 
     glutInitWindowSize(visualizer::WidthScreen, visualizer::HeightScreen);
     glutCreateWindow("Test");
+    visualizer::scaling(scaling_param);
+    visualizer::translate(center * -1.0);
     glutDisplayFunc(display);
 
     glutMotionFunc(visualizer::motion_mouse_function);
