@@ -38,7 +38,7 @@ namespace objects {
             idx = r;
         }
         const double coef = (time - history_[idx].timestamp()) 
-        / //_________________________________________________________________
+        / //-------------------------------------------------------------------
                 (history_[idx + 1].timestamp() - history_[idx].timestamp());
         geometry::Vector2d pos = geometry::lerp(
             history_[idx].position(), history_[idx + 1].position(), coef);
