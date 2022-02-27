@@ -1,5 +1,7 @@
 #include "Object.h"
 
+#include <logger/Logger.h>
+
 namespace objects {
     Object::Object(const ObjectHistory& history, UUID id, ObjectType type)
         : history_(history)
@@ -28,22 +30,22 @@ namespace objects {
         while (r - l > 1) {
             const auto m = (l + r) >> 1;
             if (history_[m].timestamp() <= time) {
-                l = m;
-            } else {
                 r = m;
+            } else {
+                l = m;
             }
         }
-        size_t idx = l;
-        if (history_[r].timestamp() <= time) {
-            idx = r;
+        size_t idx = r;
+        if (l > 0 && history_[l].timestamp() <= time) {
+            idx = l;
         }
         const double coef = (time - history_[idx].timestamp()) 
         / //-------------------------------------------------------------------
-                (history_[idx + 1].timestamp() - history_[idx].timestamp());
+                (history_[idx - 1].timestamp() - history_[idx].timestamp());
         geometry::Vector2d pos = geometry::lerp(
-            history_[idx].position(), history_[idx + 1].position(), coef);
+            history_[idx].position(), history_[idx - 1].position(), coef);
         const double yaw = geometry::lerp(
-            history_[idx].yaw(), history_[idx + 1].yaw(), coef);
+            history_[idx].yaw(), history_[idx - 1].yaw(), coef);
         return Detection(pos, history_.front().scales(), yaw, time, id_);
     }
 

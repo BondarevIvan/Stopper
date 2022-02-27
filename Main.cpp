@@ -25,7 +25,7 @@ namespace {
     }
 
     const double scaling_param = 1113;
-    const geometry::Vector2d center{28.333511, 57.817074};
+    const geometry::Vector2d center{28.333530, 57.817060};
     const double speed = 50.0;
     double timestamp = 0.0;
 
@@ -35,6 +35,8 @@ namespace {
         double dist_best = std::numeric_limits<double>::infinity();
         for (auto& way_data : ways) {
             auto& way = way_data.second;
+            if (!way.surface || *way.surface != "asphalt")
+                continue;
             const auto current_dist = boost::geometry::distance(get_way_line(way), point);
             if (!way_best || current_dist < dist_best) {
                 way_best = &way;
@@ -52,27 +54,29 @@ namespace {
             objects::ObjectHistory history;
             for (int idx = 0; idx < num_steps; ++idx) {
                 const double time = idx * step_duration;
-                const auto walk = geometry::walk_along_polyline(polyline, time * velocity);
+                const auto walk = geometry::walk_along_polyline(polyline, time * velocity + bias);
                 if (!walk)
-                    return objects::Object(history, id, objects::ObjectType::PassengerCar);
-                history.push_back(objects::Detection(
+                    break;
+                history.emplace_back(
                     geometry::get_position_on_polyline(polyline, *walk), 
-                    {width, height}, 
-                    0.0, time, id));
+                    geometry::Vector2d{width, height}, 
+                    0.0, time, id);
             }
+            std::reverse(history.begin(), history.end());
+            return objects::Object(history, id, objects::ObjectType::PassengerCar);
         };
 
         const auto make_context_objects = [&]() -> std::vector<objects::Object> {
             const auto& way = get_nearest_way(center);
-            const double width = 1e-5, height = 1e-5 * 2.0;
-            const double velocity = 1e-4;
-            const int num_step = 5;
+            const double width = 1e-5 * 5, height = 1e-4;
+            const double velocity = 1e-2;
+            const int num_step = 15;
             const double step_duration = 0.5;
             return {
-                make_centerline_moving(way, width, height, velocity, height * 0.0, num_step, step_duration, 1),
-                make_centerline_moving(way, width, height, velocity, height * 1.1, num_step, step_duration, 2),
-                make_centerline_moving(way, width, height, velocity, height * 2.2, num_step, step_duration, 3),
-                make_centerline_moving(way, width, height, velocity, height * 3.3, num_step, step_duration, 4),
+                make_centerline_moving(way, width, height, velocity, (height + width) * 0.0, num_step, step_duration, 1),
+                make_centerline_moving(way, width, height, velocity, (height + width) * 1.0, num_step, step_duration, 2),
+                make_centerline_moving(way, width, height, velocity, (height + width) * 2.0, num_step, step_duration, 3),
+                make_centerline_moving(way, width, height, velocity, (height + width) * 3.0, num_step, step_duration, 4),
             };
         };
         static objects::Context context(make_context_objects());
@@ -97,7 +101,7 @@ namespace {
 
     void timer(int) {
         display();
-        timestamp += millisecond_to_seconds(speed);
+        timestamp += 1. / speed;
         glutTimerFunc(speed, timer, 0);
     }
 }

@@ -11,7 +11,7 @@ namespace visualizer {
         glBegin(GL_LINE_LOOP);
         glColor4d(color.red, color.green, color.blue, color.alpha);
         for (const auto& point : polygon.outer()) {
-            glVertex3d(point.get<0>(), point.get<1>(), pose_z);
+            glVertex3d(point.x(), point.y(), pose_z);
         }
         glEnd();
     }
@@ -20,7 +20,7 @@ namespace visualizer {
         glBegin(GL_LINE_STRIP);
         glColor4d(color.red, color.green, color.blue, color.alpha);
         for (const auto& point : polyline) {
-            glVertex3d(point.get<0>(), point.get<1>(), pose_z);
+            glVertex3d(point.x(), point.y(), pose_z);
         }
         glEnd();
     }
@@ -48,7 +48,7 @@ namespace visualizer {
     }
 
     void visualize_object(const objects::Detection& detection) {
-        draw_polygon(detection.polygon(), make_color(0.3, 0.9, 0.1));
+        draw_polygon(detection.polygon(), make_color(0.9, 0.9, 0.1));
     }
 
     Color make_color(double red, double green, double blue, double alpha) {

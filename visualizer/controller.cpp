@@ -20,7 +20,7 @@ namespace visualizer {
     }
 
     void translate(const geometry::Vector2d& direction) {
-        glTranslated(direction.get<0>(), direction.get<1>(), 0.0);
+        glTranslated(direction.x(), direction.y(), 0.0);
         camera_params.center += direction;
     }
 
