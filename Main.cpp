@@ -8,12 +8,79 @@
 #include <cmath>
 
 namespace {
-    const double scaling_param = 1113;
-    const geometry::Vector2d center{28.333511, 57.817074};
-
     hdmap::Map& get_local_map() {
         static hdmap::Map local_map(logger::root_folder() + "/map.json");
         return local_map;
+    }
+
+    geometry::Polyline2d get_way_line(const hdmap::Way& way) {
+        std::vector<geometry::Vector2d> points;
+        const auto& local_map = get_local_map();
+        points.reserve(way.node_ids.size());
+        for (const auto& node_id : way.node_ids) {
+            const auto& node = local_map.nodes().at(node_id);
+            points.push_back(node.position);
+        }
+        return geometry::make_polyline(points);
+    }
+
+    const double scaling_param = 1113;
+    const geometry::Vector2d center{28.333511, 57.817074};
+    const double speed = 50.0;
+    double timestamp = 0.0;
+
+    const hdmap::Way& get_nearest_way(const geometry::Vector2d& point) {
+        auto& ways = get_local_map().ways();
+        hdmap::Way* way_best = nullptr;
+        double dist_best = std::numeric_limits<double>::infinity();
+        for (auto& way_data : ways) {
+            auto& way = way_data.second;
+            const auto current_dist = boost::geometry::distance(get_way_line(way), point);
+            if (!way_best || current_dist < dist_best) {
+                way_best = &way;
+                dist_best = current_dist;
+            }
+        }
+        return *way_best;
+    }
+
+    objects::Context& get_context() {
+        const auto make_centerline_moving = [](
+            const hdmap::Way& way, double width, double height, 
+            double velocity, double bias, int num_steps, double step_duration, objects::UUID id) {
+            const auto polyline = get_way_line(way);
+            objects::ObjectHistory history;
+            for (int idx = 0; idx < num_steps; ++idx) {
+                const double time = idx * step_duration;
+                const auto walk = geometry::walk_along_polyline(polyline, time * velocity);
+                if (!walk)
+                    return objects::Object(history, id, objects::ObjectType::PassengerCar);
+                history.push_back(objects::Detection(
+                    geometry::get_position_on_polyline(polyline, *walk), 
+                    {width, height}, 
+                    0.0, time, id));
+            }
+        };
+
+        const auto make_context_objects = [&]() -> std::vector<objects::Object> {
+            const auto& way = get_nearest_way(center);
+            const double width = 1e-5, height = 1e-5 * 2.0;
+            const double velocity = 1e-4;
+            const int num_step = 5;
+            const double step_duration = 0.5;
+            return {
+                make_centerline_moving(way, width, height, velocity, height * 0.0, num_step, step_duration, 1),
+                make_centerline_moving(way, width, height, velocity, height * 1.1, num_step, step_duration, 2),
+                make_centerline_moving(way, width, height, velocity, height * 2.2, num_step, step_duration, 3),
+                make_centerline_moving(way, width, height, velocity, height * 3.3, num_step, step_duration, 4),
+            };
+        };
+        static objects::Context context(make_context_objects());
+        return context;
+    }
+
+    const double millisecond_to_seconds(double milliseconds) {
+        return milliseconds / 1000.0;
     }
 
     void display() {
@@ -22,12 +89,16 @@ namespace {
         for (const auto& way_data : ways) {
             visualizer::visualize_way(get_local_map(), way_data.second);
         }
+        for (const auto object : get_context().object_at_time(timestamp)) {
+            visualizer::visualize_object(object);
+        }
         glutSwapBuffers();
     }
 
     void timer(int) {
         display();
-        glutTimerFunc(50, timer, 0);
+        timestamp += millisecond_to_seconds(speed);
+        glutTimerFunc(speed, timer, 0);
     }
 }
 
@@ -48,7 +119,7 @@ int main(int argc, char** argv) {
 
     glutMotionFunc(visualizer::motion_mouse_function);
     glutPassiveMotionFunc(visualizer::mouse_passive);
-    glutTimerFunc(50, timer, 0);
+    glutTimerFunc(speed, timer, 0);
     glutMainLoop();
 
     LOG_EVENT("end");
