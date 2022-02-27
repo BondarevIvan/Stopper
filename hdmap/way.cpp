@@ -1,6 +1,6 @@
-#include "Way.h"
+#include "way.h"
 
-#include <logger/Logger.h>
+#include <logger/logger.h>
 
 namespace hdmap {
     void parse_way(const boost::property_tree::ptree& tree, Way& way) {

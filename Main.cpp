@@ -1,9 +1,9 @@
-#include <logger/Logger.h>
-#include <geometry/Common.h>
-#include <hdmap/Map.h>
+#include <logger/logger.h>
+#include <geometry/common.h>
+#include <hdmap/map.h>
 #include <visualizer/visualizer.h>
 #include <visualizer/controller.h>
-#include <objects/Context.h>
+#include <objects/context.h>
 
 #include <cmath>
 

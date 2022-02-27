@@ -1,4 +1,4 @@
-#include "Node.h"
+#include "node.h"
 
 namespace hdmap {
     void parse_node(const boost::property_tree::ptree& tree, Node& node) {

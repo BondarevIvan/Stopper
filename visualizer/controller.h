@@ -1,5 +1,5 @@
 #pragma once
-#include <geometry/Common.h>
+#include <geometry/common.h>
 
 namespace visualizer {
     static const int WidthScreen = 800;

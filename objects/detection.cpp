@@ -1,4 +1,4 @@
-#include "Detection.h"
+#include "detection.h"
 
 namespace objects {
     Detection::Detection(

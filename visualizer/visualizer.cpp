@@ -1,6 +1,6 @@
 #include "visualizer.h"
 
-#include <logger/Logger.h>
+#include <logger/logger.h>
 
 namespace visualizer {
     const double x = 28.333511, y = 57.817074;

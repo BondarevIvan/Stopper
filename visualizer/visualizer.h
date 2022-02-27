@@ -1,8 +1,8 @@
 #pragma once
 #include <GL/glut.h>
-#include <hdmap/Map.h>
-#include <geometry/Common.h>
-#include <objects/Detection.h>
+#include <hdmap/map.h>
+#include <geometry/common.h>
+#include <objects/detection.h>
 
 namespace visualizer {
     struct Color {

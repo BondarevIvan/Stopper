@@ -1,5 +1,5 @@
 #pragma once
-#include "Way.h"
+#include "way.h"
 
 #include <unordered_map>
 

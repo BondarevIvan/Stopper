@@ -1,6 +1,6 @@
-#include "Object.h"
+#include "object.h"
 
-#include <logger/Logger.h>
+#include <logger/logger.h>
 
 namespace objects {
     Object::Object(const ObjectHistory& history, UUID id, ObjectType type)

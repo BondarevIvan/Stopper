@@ -1,5 +1,5 @@
 #pragma once
-#include "Detection.h"
+#include "detection.h"
 #include <boost/optional/optional.hpp>
 
 namespace objects {

@@ -1,7 +1,7 @@
-#include "Map.h"
+#include "map.h"
 #include <boost/property_tree/json_parser.hpp>
 
-#include <logger/Logger.h>
+#include <logger/logger.h>
 
 namespace hdmap {
     Map::Map(const std::string& filename) {

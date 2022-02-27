@@ -1,4 +1,4 @@
-#include "Common.h"
+#include "common.h"
 
 namespace geometry {
     Polygon2d make_polygon(const std::vector<Vector2d>& points) {

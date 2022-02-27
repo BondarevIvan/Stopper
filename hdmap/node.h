@@ -1,5 +1,5 @@
 #pragma once
-#include <geometry/Common.h>
+#include <geometry/common.h>
 #include <boost/property_tree/ptree.hpp>
 #include <sstream>
 
